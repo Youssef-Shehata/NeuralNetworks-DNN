@@ -1,43 +1,49 @@
-import numpy as np
-from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.model_selection import train_test_split
-from keras.models import Sequential
-from keras.layers import Embedding, LSTM, Dense
-from keras.preprocessing.sequence import pad_sequences
-from keras.preprocessing.text import Tokenizer
-from keras.utils import to_categorical
+import nltk
+from farasa.pos import FarasaPOSTagger
+from farasa.segmenter import FarasaSegmenter
+from farasa.ner import FarasaNamedEntityRecognizer
 
-# Sample sentences
-sentences = ["This is the first sentence.",
-             "And this is the second sentence.",
-             "A third sentence for tokenization."]
+def importingData():
+    cleanSens = []
+    labels = []
+    test_sentences = []
+    with open("PreProccessing/sentences.txt", 'r', encoding='utf-8') as file:
+        for line in file:
+            # Process each line as needed
+            cleanSens.append(line.strip())
+    with open("PreProccessing/labels.txt", 'r', encoding='utf-8') as file:
+        for line in file:
+            # Process each line as needed
+            labels.append(int(line.strip()))
 
-# Tokenization
-tokenizer = Tokenizer()
-tokenizer.fit_on_texts(sentences)
-total_words = len(tokenizer.word_index) + 1
 
-# TF-IDF Vectorization
-tfidf_vectorizer = TfidfVectorizer()
-X_tfidf = tfidf_vectorizer.fit_transform(sentences).toarray()
+    with open("PreProccessing/test_sentences.txt", 'r', encoding='utf-8') as file:
+        for line in file:
+            # Process each line as needed
+            test_sentences.append(line.strip())
+    return cleanSens , labels  , test_sentences
 
-# Prepare data for LSTM model
-X_lstm = pad_sequences(tokenizer.texts_to_sequences(sentences), padding='post')
-y_lstm = np.array([0, 1, 1])  # Example binary labels (0 and 1)
+nltk.download('punkt')
 
-# Split the data into training and testing sets
-X_train, X_test, y_train, y_test = train_test_split(X_lstm, y_lstm, test_size=0.2, random_state=42)
+# Example Arabic sentence
+arabic_sentence , labels ,test_sentences = importingData()
+# POS tagging using Farasa
+farasa_segmenter = FarasaSegmenter(interactive=True)
+farasa_pos_tagger = FarasaPOSTagger(interactive=True)
 
-# Build LSTM model
-model = Sequential()
-model.add(Embedding(total_words, 32, input_length=X_lstm.shape[1]))
-model.add(LSTM(100))
-model.add(Dense(1, activation='sigmoid'))
-model.compile(optimizer='adam', loss='binary_crossentropy', metrics=['accuracy'])
+# Tokenize and POS tagging
+tokens = farasa_segmenter.segment(arabic_sentence)
+pos_tags = farasa_pos_tagger.tag(tokens)
 
-# Train the model
-model.fit(X_train, y_train, epochs=5, validation_data=(X_test, y_test))
+print("Original Sentence:", arabic_sentence)
+print("Tokens:", tokens)
+print("POS Tags:", pos_tags)
 
-# Evaluate the model
-loss, accuracy = model.evaluate(X_test, y_test)
-print(f'Loss: {loss}, Accuracy: {accuracy}')
+# Spell checking using Farasa
+from farasa.stemmer import FarasaStemmer
+
+farasa_stemmer = FarasaStemmer(interactive=True)
+corrected_tokens = farasa_stemmer.stem(tokens)
+
+corrected_sentence = ' '.join(corrected_tokens)
+print("Corrected Sentence:", corrected_sentence)

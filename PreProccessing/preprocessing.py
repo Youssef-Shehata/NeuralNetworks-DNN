@@ -46,10 +46,14 @@ def removeNulls(sentences ,  lebels):
     newSens= []
     newLabels = []
     for i in range(len(sentences)):
-        if len(sentences[i]) > 1:
+        if len(sentences[i]) <=2:
+            newSens.append(' ')
+
+        else:
             newSens.append(sentences[i])
-            if(len(lebels) > 0):
-                newLabels.append(lebels[i])
+
+            # if(len(lebels) > 0):
+            #     newLabels.append(lebels[i])
     return newSens , newLabels
 
 def readData():
@@ -116,7 +120,7 @@ def preprocessingTest():
 
         cleanSens.append(sentence)
 
-    # cleanSens , _ = removeNulls(cleanSens , [])
+    cleanSens , _ = removeNulls(cleanSens , [])
 
     # Open the file in write mode
     with open("test_sentences.txt", 'w') as file:

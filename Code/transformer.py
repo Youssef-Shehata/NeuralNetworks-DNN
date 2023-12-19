@@ -35,7 +35,7 @@ def build_model(max_seq_length, vocab_size, num_classes):
     pooling_layer = GlobalAveragePooling1D()(transformer_block)
 
     # Output layer
-    outputs = Dense(num_classes, activation='sigmoid')(pooling_layer)
+    outputs = Dense(num_classes, activation='softmax')(pooling_layer)
 
     model = Model(inputs=inputs, outputs=outputs, name='transformer_model')
     return model

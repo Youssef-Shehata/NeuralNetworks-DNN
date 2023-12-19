@@ -49,7 +49,7 @@ def main():
     #     train_labels[i] = label_encoder(train_labels[i])
     # for i in range(len(val_labels)):
     #     val_labels[i] = label_encoder(val_labels[i])
-    # trans(max_sequence_length, num_unique_words, 3 , train_padded , val_padded , train_labels , val_labels )
+    # trans(max_sequence_length, num_unique_words, 3 , train_padded , val_padded , train_labels , val_labels  , test_sentences)
 
 
     ###############################################################
